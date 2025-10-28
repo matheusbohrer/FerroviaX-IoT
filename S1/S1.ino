@@ -1,9 +1,10 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
+#include <WifiClientSecure.h>
 #include <env.h>
 
-WiFiClient espClient;
-PubSubClient mqttClient(espClient);
+WiFiClientSecure wifiClient;
+PubSubClient mqttClient(wifiClient);
 
 
 const String brokerUser = "";
@@ -21,7 +22,7 @@ void setup() {
   userID += String(random(0xffff), HEX);
   while (mqttClient.connect(userID.c_str()) == 0) {
     Serial.print(".");
-    delay(200);
+    delay(2000);
   }
   mqttClient.subscribe(TOPIC_PRESENCE1.c_str());
   mqttClient.setCallback(callback);  // Função ao receber mensagem no tópico
