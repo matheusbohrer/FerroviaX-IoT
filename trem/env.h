@@ -1,21 +1,24 @@
 #ifndef ENV_H
 #define ENV_H
 
+// --- WiFi ---
 #define WIFI_SSID "FIESC_IOT_EDU"
 #define WIFI_PASS "8120gv08"
 
+// --- HiveMQ ---
 #define BROKER_URL "bbbe195380654bf482d3272ea1f6c91f.s1.eu.hivemq.cloud"
 #define BROKER_PORT 8883
+#define BROKER_USER_ID "bohrer"
+#define BROKER_USER_PASS "Matheus"
 
-// ----login criado para cada usuário no HiveMQ----
-#define BROKER_USR_ID "felipe1"
-#define BROKER_PASS_USR_PASS "Felipelucas1"
+// --- Identificação do Dispositivo
+#define DEVICE_NAME "TREM"
 
-#define BROKER_USR_ID "bohrer1"
-#define BROKER_PASS_USR_PASS "Matheus1"
-
-// ----a partir daqui depende da placa----
-#define TOPIC_PRESENCE1 ""
-...
+// --- Tópicos MQTT para Trem ---
+#define TOPIC_POSICAO "FerroviaX/TREM/posicao"
+#define TOPIC_VELOCIDADE "FerroviaX/TREM/velocidade"
+#define TOPIC_ALERTA "FerroviaX/TREM/alerta"
+#define TOPIC_STATUS "FerroviaX/TREM/status"
+#define TOPIC_PONTEH "FerroviaX/TREM/ponteH"
 
 #endif
