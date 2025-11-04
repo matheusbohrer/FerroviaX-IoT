@@ -8,8 +8,8 @@
 // --- HiveMQ ---
 #define BROKER_URL "bbbe195380654bf482d3272ea1f6c91f.s1.eu.hivemq.cloud"
 #define BROKER_PORT 8883
-#define BROKER_USER_ID "chupel"
-#define BROKER_USER_PASS "Caua"
+#define BROKER_USER_ID "caua1"
+#define BROKER_USER_PASS "Cauachupel1"
 
 // --- Identificação do Dispositivo
 #define DEVICE_NAME "S2"
