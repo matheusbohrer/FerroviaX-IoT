@@ -4,49 +4,67 @@
 #include <WiFiClientSecure.h>
 #include "env.h"
 
+
+// Inicialização de objetos
 WiFiClientSecure espClient;
 PubSubClient mqttClient(espClient);
 
 
-const String brokerUser = "";
-const String BrokerPass = "";
-
+// LED e variáveis de piscar
 const int ledPin = 2;
-
-// estado do piscar (não bloqueante)
 volatile bool blinkRequested = false;
 unsigned long blinkUntil = 0;
 
+
+// Conexão WiFi
 void setup() {
   Serial.begin(115200);    // inicia a Serial para ver mensagens de debug
   espClient.setInsecure();  // desativa verificação do certificado (somente para testes)
   WiFi.begin(WIFI_SSID, WIFI_PASS);  // inicia conexão WiFi
   Serial.println("Conectando no WiFi");
-  Serial.println("Conectado com sucesso");
-    mqttClient.setServer(brokerURL, brokerPort);
+  while (WiFi.status() != WL_CONNECTED) {
+  delay(500);
+  Serial.print(".");
+  }
+  Serial.println("\nConectado com sucesso!");
+
+
+// Conexão MQTT
+  mqttClient.setServer(BROKER_URL, BROKER_PORT);
   String userID = "S1";
   userID += String(random(0xffff), HEX);
   while (!mqttClient.connect(userID.c_str(), BROKER_USER_ID, BROKER_USER_PASS)) {
     Serial.print(".");
     delay(200);
   }
+
+
+// Inscrição e Callback
   mqttClient.setCallback(callback); // define a função chamada quando chegar mensagem no tópico
-  mqttClient.subscribe(topicPresence); // inscreve no tópico configurado
+  mqttClient.subscribe(TOPIC_PRESENCA); // inscreve no tópico configurado
+
+
+// Configuração de pino
   Serial.println("\n Conectado com sucesso!");
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, LOW);
 }
 
+
+// Loop principal
 void loop() {
   String mensagem = "";  // lê uma linha do Serial (até '\\n')
+
   if (Serial.available() > 0) {
     mensagem = Serial.readStringUntil('\n');
-  mqttClient.publish(topicPresence, mensagem.c_str());  // publica a mensagem no tópico MQTT
+  mqttClient.publish(TOPIC_PRESENCA, mensagem.c_str());  // publica a mensagem no tópico MQTT
     Serial.println(mensagem);
   }
   mqttClient.loop();
-  // trata o piscar do LED sem bloquear o programa
   unsigned long now = millis();
+
+
+  // Piscar LED (não bloqueante)
   if (blinkRequested) {
     if (now <= blinkUntil) {
       digitalWrite(ledPin, HIGH);
@@ -57,6 +75,8 @@ void loop() {
   }
 }
 
+
+// Função Callback
 void callback(char* topic, byte* payload, unsigned int length) {  // tópico, payload e tamanho
   // monta uma string C a partir do payload (evita usar String no callback)
   const unsigned int maxLen = 255;
