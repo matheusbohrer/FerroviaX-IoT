@@ -4,6 +4,16 @@
 #include <WiFiClientSecure.h>
 #include "env.h"
 
+// Pinout – Placa 1
+const int PINO_DHT        = 4;   // DHT
+const int PINO_ULTRA_ECHO = 23;  // Sensor ultrassônico - Echo
+const int PINO_ULTRA_TRIG = 22;  // Sensor ultrassônico - Trigger
+const int PINO_LED        = 19;  // LED
+const int PINO_LDR        = 34;  // LDR
+const int PINO_RGB_R      = 14;  // LED RGB - R
+const int PINO_RGB_G      = 26;  // LED RGB - G
+const int PINO_RGB_B      = 25;  // LED RGB - B
+
 
 // Inicialização de objetos
 WiFiClientSecure espClient;
@@ -11,13 +21,23 @@ PubSubClient mqttClient(espClient);
 
 
 // LED e variáveis de piscar
-const int ledPin = 2;
+const int ledPin = 14;
 volatile bool blinkRequested = false;
 unsigned long blinkUntil = 0;
 
 
 // Conexão WiFi
 void setup() {
+  pinMode(PINO_DHT, INPUT);
+  pinMode(PINO_ULTRA_ECHO, INPUT);
+  pinMode(PINO_ULTRA_TRIG, OUTPUT);
+  pinMode(PINO_LED, OUTPUT);
+  pinMode(PINO_LDR, INPUT);
+  pinMode(PINO_RGB_R, OUTPUT);
+  pinMode(PINO_RGB_G, OUTPUT);
+  pinMode(PINO_RGB_B, OUTPUT);
+  
+  
   Serial.begin(115200);    // inicia a Serial para ver mensagens de debug
   espClient.setInsecure();  // desativa verificação do certificado (somente para testes)
   WiFi.begin(WIFI_SSID, WIFI_PASS);  // inicia conexão WiFi
@@ -60,6 +80,7 @@ void loop() {
   mqttClient.publish(TOPIC_PRESENCA, mensagem.c_str());  // publica a mensagem no tópico MQTT
     Serial.println(mensagem);
   }
+
   mqttClient.loop();
   unsigned long now = millis();
 
