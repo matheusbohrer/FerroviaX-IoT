@@ -15,9 +15,6 @@
 #define DEVICE_NAME "TREM"
 
 // --- Tópicos MQTT para Trem ---
-#define TOPIC_POSICAO "FerroviaX/TREM/posicao"
-#define TOPIC_VELOCIDADE "FerroviaX/TREM/velocidade"
-#define TOPIC_ALERTA "FerroviaX/TREM/alerta"
 #define TOPIC_STATUS "FerroviaX/TREM/status"
 #define TOPIC_PONTEH "FerroviaX/TREM/ponteH"
 

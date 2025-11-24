@@ -21,7 +21,7 @@ PubSubClient mqttClient(espClient);
 
 
 // LED e variáveis de piscar
-const int ledPin = 14;
+const int ledPin = 27;
 volatile bool blinkRequested = false;
 unsigned long blinkUntil = 0;
 
@@ -76,9 +76,9 @@ void loop() {
   String mensagem = "";  // lê uma linha do Serial (até '\\n')
 
   if (Serial.available() > 0) {
-    mensagem = Serial.readStringUntil('\n');
+  mensagem = Serial.readStringUntil('\n');
   mqttClient.publish(TOPIC_PRESENCA, mensagem.c_str());  // publica a mensagem no tópico MQTT
-    Serial.println(mensagem);
+  Serial.println(mensagem);
   }
 
   mqttClient.loop();
