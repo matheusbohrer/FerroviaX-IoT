@@ -2,29 +2,20 @@
 #include <WiFiClientSecure.h>
 #include <PubSubClient.h>
 #include <Servo.h>
-#include "env.h"  // Contém as configurações de rede e tópicos MQTT
+#include "env.h"  // configurações de rede e tópicos MQTT
 
-// --- Objetos globais ---
 WiFiClientSecure espClient;
 PubSubClient mqttClient(espClient);
-Servo servo1;
-Servo servo2;
 
-// --- Pinos de hardware ---
-const int PIN_LED_ILUMINACAO = 2;   // LED de iluminação (branco)
-const int PIN_LED_R = 25;           // LED RGB - Vermelho
-const int PIN_LED_G = 26;           // LED RGB - Verde
-const int PIN_LED_B = 27;           // LED RGB - Azul
-const int PIN_SERVO1 = 14;
-const int PIN_SERVO2 = 12;
-const int PIN_PRESENCA = 34;        // Sensor de presença (digital)
+// pinos de hardware
+const servo1_pin = 26; // pino Servo 1;
+const servo2_pin = 27; // pino Servo 2;
+const byte TRIGGER_PIN = 5; // pino Sensor Ultrassônico;
+const byte ECHO_PIN = 18; // pino Sensor Ultrassônico;
+const int LED = 14; // pino LED
 
-// --- Controle interno ---
-unsigned long lastRead = 0;
-int presencaAnterior = -1;
-bool ledIluminacao = false;
-
-// Funções auxiliares
+Servo1 servo1;
+Servo2 servo2;
 
 void setRGB(int r, int g, int b) {
   analogWrite(PIN_LED_R, r);
@@ -32,7 +23,7 @@ void setRGB(int r, int g, int b) {
   analogWrite(PIN_LED_B, b);
 }
 
-// Função de callback MQTT
+// callback MQTT
 void callback(char* topic, byte* payload, unsigned int length) {
   String msg;
   for (unsigned int i = 0; i < length; i++) msg += (char)payload[i];
@@ -42,7 +33,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print(": ");
   Serial.println(msg);
 
-  // --- Controle LED de iluminação ---
+  // LED de iluminação
   if (String(topic) == TOPIC_LED) {
     if (msg == "ON") {
       digitalWrite(PIN_LED_ILUMINACAO, HIGH);
@@ -53,19 +44,19 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
   }
 
-  // --- Controle Servo 1 ---
+  // Servo 1
   if (String(topic) == TOPIC_SERVO1) {
     int pos = msg.toInt();
     servo1.write(pos);
   }
 
-  // --- Controle Servo 2 ---
+  // Servo 2
   if (String(topic) == TOPIC_SERVO2) {
     int pos = msg.toInt();
     servo2.write(pos);
   }
 
-  // --- Controle LED RGB (Status) ---
+  // LED RGB
   if (String(topic) == TOPIC_STATUS) {
     if (msg == "OK") setRGB(0, 255, 0);         // Verde
     else if (msg == "ALERTA") setRGB(255, 255, 0); // Amarelo
