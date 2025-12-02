@@ -3,6 +3,7 @@
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
 #include "env.h"
+#include <DHT.h>
 
 // Pinout – Placa 1
 const int PINO_DHT        = 4;   // DHT
@@ -18,10 +19,11 @@ const int PINO_RGB_B      = 25;  // LED RGB - B
 // Inicialização de objetos
 WiFiClientSecure espClient;
 PubSubClient mqttClient(espClient);
+DHT dht(PINO_DHT, DHT11);
 
 
 // LED e variáveis de piscar
-const int ledPin = 27;
+const int ledPin = 19;
 volatile bool blinkRequested = false;
 unsigned long blinkUntil = 0;
 
@@ -38,7 +40,7 @@ void setup() {
   pinMode(PINO_RGB_B, OUTPUT);
   
   
-  Serial.begin(115200);    // inicia a Serial para ver mensagens de debug
+  Serial.begin(115200);    // inicia a Serial para debug
   espClient.setInsecure();  // desativa verificação do certificado (somente para testes)
   WiFi.begin(WIFI_SSID, WIFI_PASS);  // inicia conexão WiFi
   Serial.println("Conectando no WiFi");
@@ -61,13 +63,75 @@ void setup() {
 
 // Inscrição e Callback
   mqttClient.setCallback(callback); // define a função chamada quando chegar mensagem no tópico
-  mqttClient.subscribe(TOPIC_PRESENCA); // inscreve no tópico configurado
+  mqttClient.subscribe(TOPIC_PRESENCA);
+  mqttClient.subscribe(TOPIC_LED);
 
 
 // Configuração de pino
   Serial.println("\n Conectado com sucesso!");
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, LOW);
+}
+
+// Leitura do ultrassonico
+float lerDistancia() {
+  // Debug dos pinos configurados
+  Serial.print("Testando sensor - Trigger: ");
+  Serial.print(PINO_ULTRA_TRIG);
+  Serial.print(", Echo: ");
+  Serial.println(PINO_ULTRA_ECHO);
+  
+  // Garantir que o trigger está LOW por mais tempo
+  digitalWrite(PINO_ULTRA_TRIG, LOW);
+  delayMicroseconds(5);
+  
+  // Enviar pulso de trigger
+  digitalWrite(PINO_ULTRA_TRIG, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(PINO_ULTRA_TRIG, LOW);
+  
+  // Ler duração do pulso no pino echo com timeout maior
+  long duracao = pulseIn(PINO_ULTRA_ECHO, HIGH, 50000); // timeout de 50ms
+  
+  // Debug da duração lida
+  Serial.print("Duração do pulso: ");
+  Serial.print(duracao);
+  Serial.println(" microsegundos");
+  
+  // Verificar se houve timeout
+  if (duracao == 0) {
+    Serial.println("Erro: timeout - sensor não responde ou mal conectado");
+    
+    // Teste adicional - verificar se o pino Echo está funcionando
+    Serial.print("Estado atual do pino Echo: ");
+    Serial.println(digitalRead(PINO_ULTRA_ECHO));
+    
+  }
+  
+  // Verificar se a duração está em um alcance válido (2cm até 400cm)
+  if (duracao < 116 || duracao > 23200) {
+    Serial.print("Duração fora do alcance válido: ");
+    Serial.println(duracao);
+    return -1;
+  }
+  
+  // Calcular distância
+  // Tempo de ida e volta
+  float distancia = (duracao * 0.0343) / 2;
+  
+  Serial.print("Distância calculada: ");
+  Serial.print(distancia);
+  Serial.println(" cm");
+  
+  return distancia;
+}
+
+ // Leitura do LDR
+ float lerIluminacao() {
+
+  int raw = analogRead(PINO_LDR);
+  float iluminacao = raw;
+  return iluminacao;
 }
 
 
