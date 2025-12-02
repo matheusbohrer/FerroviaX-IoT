@@ -21,7 +21,7 @@ PubSubClient mqttClient(espClient);
 
 
 // LED e variáveis de piscar
-const int ledPin = 27;
+const int ledPin = 19;
 volatile bool blinkRequested = false;
 unsigned long blinkUntil = 0;
 
