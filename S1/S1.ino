@@ -22,7 +22,8 @@ PubSubClient mqttClient(espClient);
 DHT dht(PINO_DHT, DHT11);
 
 
-// variáveis de piscar
+// LED e variáveis de piscar
+const int ledPin = 27;
 volatile bool blinkRequested = false;
 unsigned long blinkUntil = 0;
 
