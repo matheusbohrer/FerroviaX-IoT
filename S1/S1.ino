@@ -160,7 +160,6 @@ void loop() {
   }
 }
 
-
 // Função Callback
 void callback(char* topic, byte* payload, unsigned int length) {  // tópico, payload e tamanho
   // monta uma string C a partir do payload (evita usar String no callback)
